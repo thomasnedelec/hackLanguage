@@ -94,7 +94,7 @@ def SVM(X,Y,nLanguage,nModel):
     return weights
     
 if __name__ == '__main__':
-    LANGUAGES=list(set(['fr','en','ru']))
+    LANGUAGES=list(set(['fr','es','ru']))
     #LANGUAGES = list(set(['ru', 'en-us', 'de','yue','fr']))
     n = 3
     nLanguages=3
