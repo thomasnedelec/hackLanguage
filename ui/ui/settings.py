@@ -52,10 +52,12 @@ MIDDLEWARE_CLASSES = [
 
 ROOT_URLCONF = 'ui.urls'
 
+TEMPLATE_PATH = os.path.join(BASE_DIR, 'detector/templates') #'/home/dudu/hack_cambridge/cambridge/ui/detector/templates'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATE_PATH],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -67,6 +69,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'ui.wsgi.application'
 

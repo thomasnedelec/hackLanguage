@@ -64,7 +64,7 @@ tf.app.flags.DEFINE_string("data_dir", "/tmp", "Data directory")
 tf.app.flags.DEFINE_string("train_dir", "/tmp", "Training directory.")
 tf.app.flags.DEFINE_integer("max_train_data_size", 0,
                             "Limit on the size of training data (0: no limit).")
-tf.app.flags.DEFINE_integer("steps_per_checkpoint", 200,
+tf.app.flags.DEFINE_integer("steps_per_checkpoint", 10,
                             "How many training steps to do per checkpoint.")
 tf.app.flags.DEFINE_boolean("decode", False,
                             "Set to True for interactive decoding.")
@@ -247,6 +247,41 @@ def train():
 #       sys.stdout.flush()
 #       sentence = sys.stdin.readline()
 
+def Decode_Parsed():
+    with tf.Session() as sess:
+        en_train = "train_in_User_"
+        fr_train = "train_out_User_"
+        en_dev = "dev_in_User_"
+        fr_dev = "dev_out_User_"
+    
+        # Read data into buckets and compute their sizes.
+        print ("Reading development and training data (limit: %d)."
+               % FLAGS.max_train_data_size)
+        dev_set = read_data(en_dev, fr_dev)
+        #train_set = read_data(en_train, fr_train, FLAGS.max_train_data_size)
+        
+        model = create_model(sess, True)    
+        model.batch_size = 1
+        
+        bucket_id = 0
+        
+        corr = 0
+        size = 0
+        for t in dev_set[2:]:
+            size += 1
+            t_inp = t[0]
+            t_op = t[1]
+            encoder_inputs, decoder_inputs, target_weights = model.get_batch(
+            {bucket_id: [(t_inp, [])]}, bucket_id)
+            _, _, output_logits = model.step(sess, encoder_inputs, decoder_inputs, 
+                                             target_weights, bucket_id, True)
+            print(output_logits)
+            outputs = [int(np.argmax(logit, axis=1)) for logit in output_logits]
+            outputs = outputs[1]
+            if outputs == t_op:
+                corr += 1
+    
+        print(corr / size)
 
 def self_test():
   """Test the translation model."""
@@ -272,8 +307,7 @@ def main(_):
   if FLAGS.self_test:
     self_test()
   elif FLAGS.decode:
-    #decode()
-    print("Sorry!")
+    Decode_Parsed()
   else:
     train()
 
